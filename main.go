@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/HelloHaiGG/WeChat/common/igorm"
 	"github.com/HelloHaiGG/WeChat/common/iredis"
 	"github.com/HelloHaiGG/WeChat/config"
 )
@@ -15,4 +16,5 @@ func main() {
 		DB:       config.APPCfg.Redis.DB,
 		Password: config.APPCfg.Redis.Password,
 	})
+	igorm.Init("")
 }
