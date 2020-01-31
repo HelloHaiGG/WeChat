@@ -1,0 +1,12 @@
+mysql:
+  host: cd-cdb-3w8ntur2.sql.tencentcdb.com
+  port: 62626
+  user: root
+  password: root123456
+
+redis:
+  host: 111.229.58.109
+  port: 6379
+  user: root
+  password: root123456
+  db: 0
