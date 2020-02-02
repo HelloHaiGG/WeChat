@@ -16,7 +16,7 @@ func ChatRouter() *iris.Application {
 	app.OnErrorCode(iris.StatusNotFound, internal)
 
 	app.Get("/", index)
-
+	
 	return app
 }
 
