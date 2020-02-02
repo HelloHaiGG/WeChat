@@ -3,9 +3,6 @@ package main
 import (
 	"github.com/HelloHaiGG/WeChat/common/iredis"
 	"github.com/HelloHaiGG/WeChat/config"
-	"github.com/HelloHaiGG/WeChat/router"
-	"github.com/kataras/iris"
-	"log"
 )
 
 func main() {
@@ -17,9 +14,20 @@ func main() {
 		Password: config.APPCfg.Redis.Password,
 	})
 
-	//接口
+	////启动路由
+	//if err := testrouter.Router().Run(iris.Addr(":2428")); err != nil {
+	//	log.Fatalf("Router Run Err:%v", err)
+	//}
 
-	if err := router.Router().Run(iris.Addr(":2428")); err != nil {
-		log.Fatalf("Router Run Err:%v", err)
-	}
+	//启动路由 二
+	//listener, err := net.Listen("tcp", ":2428")
+	//if err != nil {
+	//	log.Fatalf("Router Run Err:%v", err)
+	//}
+	//err = testrouter.Router().Run(iris.Listener(listener))
+	//if err != nil {
+	//	log.Fatalf("Router Run Err:%v", err)
+	//}
+
+
 }

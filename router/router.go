@@ -1,34 +1,34 @@
 package router
 
 import (
-	"github.com/HelloHaiGG/WeChat/router/controller"
+	"github.com/HelloHaiGG/WeChat/common"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	recover2 "github.com/kataras/iris/middleware/recover"
-	"github.com/kataras/iris/mvc"
 )
 
-func Router() *iris.Application {
+func ChatRouter() *iris.Application {
 	app := iris.New()
+	app.Use(recover2.New(), logger.New())
 
-	app.Use(recover2.New())
-	app.Use(logger.New())
+	app.OnErrorCode(iris.StatusForbidden, forbidden)
+	app.OnErrorCode(iris.StatusInternalServerError, notfound)
+	app.OnErrorCode(iris.StatusNotFound, internal)
 
-	//接口形式
-	app.Handle("GET","/path",func(cxt iris.Context){
-		//形式一
-	})
-	app.Get("/path/get", func(cxt iris.Context) {
-		//形式二
-		cxt.JSON(iris.Map{"x": "xx",})
-		//cxt.WriteString("sss")
-	})
+	app.Get("/", index)
 
-	//mvc 形式  通过 mvc.New() 创建 mvc.Application 对象，application 对象 通过 Handle 绑定 控制器
-	mvc.New(app).Handle(new(controller.TestController))
-	//mvc 形式  通过 mvc.Configure 设置路由组和配置 控制器
-	mvc.Configure(app.Party("/group"), func(a *mvc.Application) {
-		a.Handle(new(controller.TestController))
-	})
 	return app
+}
+
+func forbidden(cxt iris.Context) {
+	_, _ = cxt.JSON(iris.Map{"code": iris.StatusForbidden, "msg": common.ForbiddenDesc})
+}
+func notfound(cxt iris.Context) {
+	_, _ = cxt.JSON(iris.Map{"code": iris.StatusNotFound, "msg": common.NotFindDesc})
+}
+func internal(cxt iris.Context) {
+	_, _ = cxt.JSON(iris.Map{"code": iris.StatusInternalServerError, "msg": common.InternalDesc})
+}
+func index(cxt iris.Context) {
+	_, _ = cxt.WriteString("Welcome WeChat!")
 }

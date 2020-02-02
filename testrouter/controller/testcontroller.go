@@ -20,7 +20,8 @@ func (p *TestController) GetHello() string {
 
 //使用 BeforeActivation 将请求路径和处理方法一一对应
 func (p *TestController)BeforeActivation(b mvc.BeforeActivation)  {
-	b.Handle("GET","path/hello","SayHello")
+	b.Handle("GET","path/hello", "SayHello")
+	//还可以添加中间件
 }
 func (p *TestController)SayHello() mvc.Result {
 	return mvc.Response{
