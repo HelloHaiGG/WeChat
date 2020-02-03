@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"github.com/HelloHaiGG/WeChat/common/igorm"
 	"github.com/HelloHaiGG/WeChat/common/iredis"
 	"github.com/HelloHaiGG/WeChat/config"
+	"github.com/HelloHaiGG/WeChat/router"
+	"github.com/kataras/iris"
 )
 
 func main() {
@@ -13,7 +17,7 @@ func main() {
 		DB:       config.APPCfg.Redis.DB,
 		Password: config.APPCfg.Redis.Password,
 	})
-
+	igorm.Init("chat")
 	////启动路由
 	//if err := testrouter.Router().Run(iris.Addr(":2428")); err != nil {
 	//	log.Fatalf("Router Run Err:%v", err)
@@ -29,5 +33,7 @@ func main() {
 	//	log.Fatalf("Router Run Err:%v", err)
 	//}
 
-
+	if err := router.ChatRouter().Run(iris.Addr(":2428")); err != nil {
+		fmt.Println(err)
+	}
 }

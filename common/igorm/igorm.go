@@ -19,12 +19,13 @@ func Init(db string) {
 		strconv.Itoa(config.APPCfg.Mysql.Port),
 		db,
 	)
-	DB, err := gorm.Open("mysql", args)
+	instance, err := gorm.Open("mysql", args)
 	if err != nil {
-		log.Fatalf("Content DB:%s Error.", db)
+		log.Fatalf("Content DB:'%s' Error.", db)
 	}
-
+	DB = instance
 	DB.DB().SetMaxIdleConns(10)  //连接池中最大空闲连接数
 	DB.DB().SetMaxOpenConns(100) //最大连接数
 	DB.SingularTable(true)       //表名单数形式
+	DB.LogMode(true)
 }

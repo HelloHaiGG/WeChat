@@ -2,9 +2,12 @@ package router
 
 import (
 	"github.com/HelloHaiGG/WeChat/common"
+	"github.com/HelloHaiGG/WeChat/servers/user/controller"
 	"github.com/kataras/iris"
+	"github.com/kataras/iris/core/router"
 	"github.com/kataras/iris/middleware/logger"
 	recover2 "github.com/kataras/iris/middleware/recover"
+	"github.com/kataras/iris/mvc"
 )
 
 func ChatRouter() *iris.Application {
@@ -16,7 +19,15 @@ func ChatRouter() *iris.Application {
 	app.OnErrorCode(iris.StatusNotFound, internal)
 
 	app.Get("/", index)
-	
+
+	app.PartyFunc("/user", func(p router.Party) {
+		p.Post("/register", controller.Register).Name = "用户注册"
+		p.Post("/login", controller.Login).Name = "用户登录/退出"
+	})
+
+	mvc.Configure(app.Party("/friends"), func(a *mvc.Application) {
+		a.Handle(new(controller.FriendsController))
+	})
 	return app
 }
 
