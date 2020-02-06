@@ -17,8 +17,8 @@ func ChatRouter() *iris.Application {
 	app.Use(recover2.New(), logger.New())
 
 	app.OnErrorCode(iris.StatusForbidden, forbidden)
-	app.OnErrorCode(iris.StatusInternalServerError, notfound)
-	app.OnErrorCode(iris.StatusNotFound, internal)
+	app.OnErrorCode(iris.StatusNotFound, notfound)
+	app.OnErrorCode(iris.StatusInternalServerError, internal)
 
 	app.Get("/", index)
 

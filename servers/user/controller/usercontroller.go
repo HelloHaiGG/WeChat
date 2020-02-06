@@ -18,6 +18,7 @@ func Register(cxt iris.Context) {
 			"code": iris.StatusForbidden,
 			"msg":  common.ForbiddenDesc,
 		})
+		return
 	}
 
 	if len(register.NickName) < 6 || len(register.NickName) > 18 {
