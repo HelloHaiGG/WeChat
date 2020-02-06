@@ -10,9 +10,11 @@ import (
 
 //客户端
 type Client struct {
-	Conn    *websocket.Conn
-	User    models2.User
-	MsgChan chan *models.Msg //客户端消息通道
+	RoomName string
+	Conn     *websocket.Conn
+	User     models2.User
+	MsgChan  chan *models.Msg //客户端消息通道
+	OutChan  chan *Client     //客户端退出消息监听
 }
 
 //func (p *Client) WriteMsg() {
@@ -44,7 +46,12 @@ func (p *Client) ReadMsg() {
 
 	for {
 		if _, msg, err = p.Conn.ReadMessage(); err != nil {
+			//客户端断开链接
 			_ = p.Conn.Close()
+			p.OutChan <- p
+			close(p.MsgChan)
+			close(p.OutChan)
+			return
 		}
 
 		str := string(msg)

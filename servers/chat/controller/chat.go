@@ -50,11 +50,6 @@ func (p *ChatController) InitChatServer() mvc.Result {
 	//初始化聊天室名称
 	roomName := fmt.Sprintf("room-%d", roomNO)
 
-	//判断改聊天室是否已经存在
-	if _, ok := roomManager.RoomsMap[roomName]; ok {
-		return mvc.Response{Code: iris.StatusForbidden, Text: common.ChatRoomAlreadyExists}
-	}
-
 	//获取成员信息
 	user, err := db.QueryUserByNumber(userNO)
 	if err != nil {
@@ -66,14 +61,21 @@ func (p *ChatController) InitChatServer() mvc.Result {
 		return mvc.Response{Code: iris.StatusInternalServerError,}
 	}
 	client := &Client{
-		User:    user,
-		Conn:    p.Conn,
-		MsgChan: make(chan *models.Msg, 0),
+		RoomName: roomName,
+		User:     user,
+		Conn:     p.Conn,
+		MsgChan:  make(chan *models.Msg, 0),
+		OutChan:  make(chan *Client, 0),
 	}
 	//websocket
 	go client.ReadMsg()
 
-	p.Manager.InitRoom(roomName, client)
+	//判断改聊天室是否已经存在
+	if _, ok := roomManager.RoomsMap[roomName]; !ok {
+		p.Manager.InitRoom(roomName, client)
+	} else {
+		roomManager.ClientInRoom(roomName, client)
+	}
 
 	return mvc.Response{Code: iris.StatusOK,}
 }
@@ -109,16 +111,17 @@ func (p *ChatController) InChatRoom() mvc.Result {
 	}
 
 	client := &Client{
-		User:    user,
-		Conn:    p.Conn,
-		MsgChan: make(chan *models.Msg, 0),
+		RoomName: roomName,
+		User:     user,
+		Conn:     p.Conn,
+		MsgChan:  make(chan *models.Msg, 0),
+		OutChan:  make(chan *Client, 0),
 	}
 	//websocket
 	go client.ReadMsg()
 
 	roomManager.ClientInRoom(roomName, client)
 
-	//p.Manager.InitRoom(":6666", p.Conn)
 	return mvc.Response{
 		Code: iris.StatusOK,
 	}
@@ -132,8 +135,6 @@ func (p *ChatController) OutChatRoom() mvc.Result {
 			Code: iris.StatusInternalServerError,
 		}
 	}
-
-	//p.Manager.ClientOutRoom(":6666", &p.Conn)
 
 	return mvc.Response{
 		Code: iris.StatusOK,
@@ -152,5 +153,10 @@ func (p *ChatController) upgrade() error {
 	}
 
 	p.Conn = conn
+
+	conn.SetCloseHandler(func(code int, text string) error {
+		text = "sss"
+		return nil
+	})
 	return nil
 }

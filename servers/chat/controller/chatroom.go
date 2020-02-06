@@ -31,8 +31,18 @@ func (p *ChatRoom) InRoom(conn *Client) {
 	go func() {
 		for {
 			select {
-			case msg := <-conn.MsgChan:
-				p.MsgChan <- msg
+			case msg, ok := <-conn.MsgChan:
+				if ok {
+					p.MsgChan <- msg
+				} else {
+					return
+				}
+			case client, ok := <-conn.OutChan:
+				if ok {
+					roomManager.ClientOutRoom(client.RoomName, client)
+				} else {
+					return
+				}
 			}
 		}
 	}()
@@ -66,8 +76,12 @@ func (p *ChatRoom) Broadcast(msg *models.Msg) {
 func (p *ChatRoom) Start() {
 	for {
 		select {
-		case msg := <-p.MsgChan:
-			p.Broadcast(msg)
+		case msg, ok := <-p.MsgChan:
+			if ok {
+				p.Broadcast(msg)
+			} else {
+				return
+			}
 		}
 	}
 }

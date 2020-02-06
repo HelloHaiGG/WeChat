@@ -51,9 +51,17 @@ func (p *RoomManager) ClientInRoom(roomName string, client *Client) mvc.Result {
 }
 
 //客户端离开聊天室
-func (p *RoomManager) ClientOutRoom(roomAddr string, conn *Client) {
-	if room, ok := p.RoomsMap[roomAddr]; ok {
+func (p *RoomManager) ClientOutRoom(roomName string, conn *Client) {
+	if room, ok := p.RoomsMap[roomName]; ok {
 		delete(room.ClientsMap, conn)
 		room.OutRoom(conn)
+		room.OnlineNum--
+	}
+
+	//判断聊天室是否已经没人
+	if p.RoomsMap[roomName].OnlineNum <= 0 {
+		//删除聊天室
+		close(p.RoomsMap[roomName].MsgChan)
+		delete(p.RoomsMap, roomName)
 	}
 }
