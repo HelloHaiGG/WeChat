@@ -10,4 +10,5 @@ const (
 	UserAlreadyExists      = "用户已存在"
 	UserDoesNotExist       = "用户不存在"
 	ThePasswordIsIncorrect = "密码不正确"
+	ChatRoomAlreadyExists  = "聊天室已经存在"
 )

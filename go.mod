@@ -12,6 +12,7 @@ require (
 	github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4 // indirect
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/gorilla/schema v1.1.0 // indirect
+	github.com/gorilla/websocket v1.4.1
 	github.com/iris-contrib/blackfriday v2.0.0+incompatible // indirect
 	github.com/iris-contrib/formBinder v5.0.0+incompatible // indirect
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible // indirect
@@ -25,5 +26,6 @@ require (
 	github.com/onsi/gomega v1.8.1 // indirect
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )

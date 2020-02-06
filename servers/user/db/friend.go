@@ -1,13 +1,14 @@
-package models
+package db
 
 import (
 	"bytes"
 	"github.com/HelloHaiGG/WeChat/common/igorm"
 	"github.com/HelloHaiGG/WeChat/servers/chat/models"
+	models2 "github.com/HelloHaiGG/WeChat/servers/user/models"
 )
 
-func QueryFList(req QueryFListReq) ([]*User, error) {
-	var list []*User
+func QueryFList(req models2.QueryFListReq) ([]*models2.User, error) {
+	var list []*models2.User
 
 	query := new(bytes.Buffer)
 	args := make([]interface{}, 0)
@@ -25,7 +26,7 @@ func QueryFList(req QueryFListReq) ([]*User, error) {
 	return list, nil
 }
 
-func AddFriend(req AddFriendReq) error {
+func AddFriend(req models2.AddFriendReq) error {
 	var friend models.FriendsList
 	friend.NO = req.NO
 	friend.PNO = req.PNO

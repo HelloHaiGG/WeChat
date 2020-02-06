@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/HelloHaiGG/WeChat/common"
+	"github.com/HelloHaiGG/WeChat/servers/user/db"
 	"github.com/HelloHaiGG/WeChat/servers/user/models"
 	"github.com/jinzhu/gorm"
 	"github.com/kataras/iris"
@@ -36,7 +37,7 @@ func Register(cxt iris.Context) {
 	}
 
 	//判断用户是否存在
-	if user, err := models.QueryUserByNickName(register.NickName); err == nil && !reflect.DeepEqual(user, models.User{}) {
+	if user, err := db.QueryUserByNickName(register.NickName); err == nil && !reflect.DeepEqual(user, models.User{}) {
 		//存在
 		_, _ = cxt.JSON(iris.Map{
 			"code": iris.StatusForbidden,
@@ -59,7 +60,7 @@ func Register(cxt iris.Context) {
 	user.NO = userNo
 	user.Port = "8462" //默认端口
 	//生成用户数据
-	if err := models.UserRegister(user); err != nil {
+	if err := db.UserRegister(user); err != nil {
 		_, _ = cxt.JSON(iris.Map{
 			"code": iris.StatusInternalServerError,
 			"msg":  common.InternalDesc,
@@ -105,7 +106,7 @@ func Login(cxt iris.Context) {
 	}
 
 	//判断用户是否存在
-	if user, err = models.QueryUserByNumber(login.NO); err != nil && err == gorm.ErrRecordNotFound {
+	if user, err = db.QueryUserByNumber(login.NO); err != nil && err == gorm.ErrRecordNotFound {
 		_, _ = cxt.JSON(iris.Map{
 			"code": iris.StatusOK,
 			"msg":  common.UserDoesNotExist,
@@ -129,7 +130,7 @@ func Login(cxt iris.Context) {
 	//获取 用户地址
 	login.Addr = cxt.RemoteAddr()
 
-	if err := models.Login(login); err != nil {
+	if err := db.Login(login); err != nil {
 		_, _ = cxt.JSON(iris.Map{
 			"code": iris.StatusInternalServerError,
 			"msg":  common.InternalDesc,
