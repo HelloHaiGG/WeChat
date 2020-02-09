@@ -10,3 +10,11 @@ redis:
   user: root
   password: root123456
   db: 0
+
+mongo:
+  host: 111.229.58.109
+  port: 27017
+  user: "root"
+  password: "123456"
+  db: "test"
+  auth_source: ""

@@ -127,20 +127,6 @@ func (p *ChatController) InChatRoom() mvc.Result {
 	}
 }
 
-//退出聊天室
-func (p *ChatController) OutChatRoom() mvc.Result {
-
-	if err := p.upgrade(); err != nil {
-		return mvc.Response{
-			Code: iris.StatusInternalServerError,
-		}
-	}
-
-	return mvc.Response{
-		Code: iris.StatusOK,
-	}
-}
-
 //http 升级为 websocket
 func (p *ChatController) upgrade() error {
 	//将http请求升级为websocket
@@ -151,12 +137,7 @@ func (p *ChatController) upgrade() error {
 	if err != nil {
 		return err
 	}
-
 	p.Conn = conn
 
-	conn.SetCloseHandler(func(code int, text string) error {
-		text = "sss"
-		return nil
-	})
 	return nil
 }
