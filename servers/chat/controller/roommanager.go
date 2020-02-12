@@ -4,17 +4,19 @@ import (
 	"github.com/HelloHaiGG/WeChat/servers/chat/models"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
+	"sync"
 )
 
 //聊天室管理对象
 type RoomManager struct {
-	RoomsMap map[string]*ChatRoom
-	Rooms    []*ChatRoom
+	//RoomsMap map[string]*ChatRoom
+	RoomMap sync.Map
+	Rooms   []*ChatRoom
 }
 
 //创建聊天室,客户端进入聊天室
 func (p *RoomManager) InitRoom(roomName string, client *Client) {
-	if _, ok := p.RoomsMap[roomName]; !ok {
+	if _, ok := p.RoomMap.Load(roomName); !ok {
 		room := &ChatRoom{
 			Name:       roomName,
 			OnlineNum:  0,
@@ -25,25 +27,32 @@ func (p *RoomManager) InitRoom(roomName string, client *Client) {
 		room.Clients = append(room.Clients, client)
 		room.ClientsMap[client] = true
 		room.OnlineNum++
-		p.RoomsMap[roomName] = room
+		p.RoomMap.Store(roomName, room)
 		p.Rooms = append(p.Rooms, room)
 	}
 
 	//开启聊天室广播
-	go p.RoomsMap[roomName].Start()
+	go func() {
+		room, _ := p.RoomMap.Load(roomName)
+		room.(*ChatRoom).Start()
+	}()
 
-	p.RoomsMap[roomName].InRoom(client)
+	room, _ := p.RoomMap.Load(roomName)
+
+	//发放消息
+	room.(*ChatRoom).InRoom(client)
 }
 
 // 客户端进入聊天室
 func (p *RoomManager) ClientInRoom(roomName string, client *Client) mvc.Result {
-	if room, ok := p.RoomsMap[roomName]; !ok {
+	if room, ok := p.RoomMap.Load(roomName); !ok {
 		return mvc.Response{Code: iris.StatusInternalServerError,}
 	} else {
-		room.Clients = append(room.Clients, client)
-		room.ClientsMap[client] = true
-		room.OnlineNum++
-		room.InRoom(client)
+		r := room.(*ChatRoom)
+		r.Clients = append(r.Clients, client)
+		r.ClientsMap[client] = true
+		r.OnlineNum++
+		r.InRoom(client)
 	}
 	return mvc.Response{
 		Code: iris.StatusOK,
@@ -51,17 +60,25 @@ func (p *RoomManager) ClientInRoom(roomName string, client *Client) mvc.Result {
 }
 
 //客户端离开聊天室
-func (p *RoomManager) ClientOutRoom(roomName string, conn *Client) {
-	if room, ok := p.RoomsMap[roomName]; ok {
-		delete(room.ClientsMap, conn)
-		room.OutRoom(conn)
-		room.OnlineNum--
+func (p *RoomManager) ClientOutRoom(roomName string, addr string) {
+	//取到对应的房间
+	if room, ok := p.RoomMap.Load(roomName); ok {
+		r := room.(*ChatRoom)
+		//再找到对应的连接
+		for k, _ := range r.ClientsMap {
+			if k.Conn.RemoteAddr().String() == addr {
+				delete(r.ClientsMap, k)
+			}
+		}
+		r.OnlineNum--
 	}
 
 	//判断聊天室是否已经没人
-	if p.RoomsMap[roomName].OnlineNum <= 0 {
-		//删除聊天室
-		close(p.RoomsMap[roomName].MsgChan)
-		delete(p.RoomsMap, roomName)
+	if room, ok := p.RoomMap.Load(roomName); ok {
+		r := room.(*ChatRoom)
+		if r.OnlineNum <= 0 {
+			close(r.MsgChan)
+			p.RoomMap.Delete(roomName)
+		}
 	}
 }

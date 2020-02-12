@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/HelloHaiGG/WeChat/common"
 	"github.com/HelloHaiGG/WeChat/common/igorm"
 	"github.com/HelloHaiGG/WeChat/common/imongo"
 	"github.com/HelloHaiGG/WeChat/common/iredis"
@@ -9,6 +10,8 @@ import (
 	"github.com/HelloHaiGG/WeChat/router"
 	"github.com/kataras/iris"
 )
+
+
 
 func main() {
 	config.Init()
@@ -43,8 +46,12 @@ func main() {
 	//if err != nil {
 	//	log.Fatalf("Router Run Err:%v", err)
 	//}
+	common.NumberHolder = new(common.NumberPollHolder)
+	//加载未被注册的账号到全局Map
+	common.NumberHolder.NumberPollLoad()
 
 	if err := router.ChatRouter().Run(iris.Addr(":2428")); err != nil {
 		fmt.Println(err)
 	}
+
 }
