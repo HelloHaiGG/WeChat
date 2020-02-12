@@ -4,14 +4,11 @@ import "github.com/HelloHaiGG/WeChat/servers/user/models"
 
 //聊天室
 type ChatRoom struct {
-	Id        int64  `json:"id" gorm:"-"`
-	NO        int64  `json:"no" gorm:"column:NO"`
-	Level     int    `json:"level" gorm:"level"`
-	HNO       int64  `json:"h_no" gorm:"column:H_NO"`
-	Addr      string `json:"addr" gorm:"addr"`
-	Port      string `json:"port" gorm:"port"`
-	OnlineNum int    `json:"online_num" gorm:"online_num"`
-	IsDelete  int    `json:"is_delete" gorm:"is_delete"`
+	Id       int64  `json:"id" gorm:"-"`
+	HNO      int64  `json:"h_no" gorm:"column:H_NO"`
+	Number   int    `json:"number" gorm:"number"`
+	IsDelete int    `json:"is_delete" gorm:"is_delete"`
+	Name     string `json:"name" gorm:"name"`
 }
 
 //好友列表
@@ -26,7 +23,7 @@ type FriendsList struct {
 type MembersList struct {
 	Id       int64 `json:"id" gorm:"-"`
 	NO       int64 `json:"no" gorm:"column:NO"`
-	RNO      int64 `json:"no" gorm:"column:R_NO"`    //房间列表
+	RId      int64 `json:"r_id" gorm:"r_id"`         //房间列表
 	Identity int   `json:"identity" gorm:"identity"` //成员身份 1.房主 2.成员
 }
 
@@ -41,17 +38,63 @@ type Msg struct {
 	SourceAddr string      `json:"source_addr"`
 	SourceNO   int64       `json:"source_no"`
 	User       models.User `json:"user"`
-	Holder     OutHolder  `json:"holder"` //退出聊天室
+	Holder     OutHolder   `json:"holder"` //退出聊天室
 }
 
 //退出聊天室
 type OutHolder struct {
-	Out bool
+	Out      bool
 	RoomName string
 }
 
 //创建房间
 type CreateChatRoomReq struct {
-	NO    int64 `json:"no"`
-	Level int   `json:"level"`
+	Name   string `json:"name"`
+	HNO    int64 `json:"hno"` //房主
+	Level  int   `json:"level"`
+	Number int   `json:"number"`
+}
+
+//更新房间
+type UpdateChatRoomReq struct {
+	HNO    int64 `json:"hno"`
+	Number int64 `json:"number"`
+}
+
+//通过Name查询房间信息
+type QueryRoomByNameReq struct {
+	Name string `json:"name"`
+}
+
+//返回结果
+type QueryRoomByNameRes struct {
+	room *ChatRoom
+}
+
+//通过ID查询房间信息
+type QueryRoomByIdReq struct {
+	Id int64 `json:"id"`
+}
+
+//返回结果
+type QueryRoomByIdRes struct {
+	Room *ChatRoom
+}
+
+//查询房间内成员的信息
+type QueryRoomMembersReq struct {
+	RId    int64
+	Online int // 1,查询在线 0 不在线
+}
+
+//返回结果
+type QueryRoomMemberRes struct {
+	Users []*models.User
+}
+
+//加入到聊天室
+type InChatRoomReq struct {
+	RoomName string
+	NO       int64
+	RoomId   int64
 }
