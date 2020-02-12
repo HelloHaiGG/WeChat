@@ -27,6 +27,7 @@ func RecordChanListener() {
 }
 
 //将聊天记录备份到redis 队列
+//思路：判断聊天室内未上线的玩家，将聊天室信息推送的队列。玩家上线后，将信息推送给玩家，并删除队列
 //func RecordBackupChanListener(msg *models.Msg) {
 //	for {
 //		select {
