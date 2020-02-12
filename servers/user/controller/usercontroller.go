@@ -1,14 +1,16 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/HelloHaiGG/WeChat/common"
+	"github.com/HelloHaiGG/WeChat/common/iredis"
 	"github.com/HelloHaiGG/WeChat/servers/user/db"
 	"github.com/HelloHaiGG/WeChat/servers/user/models"
 	"github.com/jinzhu/gorm"
 	"github.com/kataras/iris"
 	"reflect"
 	"strings"
-	"time"
 )
 
 func Register(cxt iris.Context) {
@@ -53,12 +55,20 @@ func Register(cxt iris.Context) {
 		})
 		return
 	}
-	//生成用户唯一账号:时间戳
-	userNo := time.Now().Unix()
+	//获取用户 NO
 	var user models.User
 	user.NickName = register.NickName
 	user.Password = register.Password
-	user.NO = userNo
+	if NO, err := common.NumberHolder.GetNumber(); err != nil {
+		//查询出错
+		_, _ = cxt.JSON(iris.Map{
+			"code": iris.StatusInternalServerError,
+			"msg":  common.InternalDesc,
+		})
+		return
+	} else {
+		user.NO = NO
+	}
 	user.Port = "8462" //默认端口
 	//生成用户数据
 	if err := db.UserRegister(user); err != nil {
@@ -71,7 +81,7 @@ func Register(cxt iris.Context) {
 	//注册成功
 	_, _ = cxt.JSON(iris.Map{
 		"code": iris.StatusOK,
-		"NO":   userNo,
+		"NO":   user.NO,
 	})
 }
 
@@ -137,6 +147,14 @@ func Login(cxt iris.Context) {
 			"msg":  common.InternalDesc,
 		})
 		return
+	}
+
+	//处理用户信息 redis
+	userInfo, _ := json.Marshal(&user)
+	if login.IsLogin == 1{
+		iredis.RedisCli.HSet("USER_INFO_KEY", fmt.Sprintf("%d_INFO", user.NO), string(userInfo))
+	}else{
+		iredis.RedisCli.HDel("USER_INFO_KEY",fmt.Sprintf("%d_INFO",user.NO))
 	}
 
 	_, _ = cxt.JSON(iris.Map{

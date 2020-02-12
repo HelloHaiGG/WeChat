@@ -34,12 +34,9 @@ func (p *ChatRoom) InRoom(conn *Client) {
 			case msg, ok := <-conn.MsgChan:
 				if ok {
 					p.MsgChan <- msg
-				} else {
-					return
-				}
-			case client, ok := <-conn.OutChan:
-				if ok {
-					roomManager.ClientOutRoom(client.RoomName, client)
+					if msg.KindMsg == 1 && msg.Holder.Out{
+						roomManager.ClientOutRoom(msg.Holder.RoomName,msg.SourceAddr)
+					}
 				} else {
 					return
 				}
@@ -50,21 +47,11 @@ func (p *ChatRoom) InRoom(conn *Client) {
 	p.MsgChan <- msg
 }
 
-func (p *ChatRoom) OutRoom(conn *Client) {
-	msg := &models.Msg{
-		KindMsg:    1,
-		Msg:        fmt.Sprintf(" -%d- 退出聊天室", conn.User.NO),
-		Time:       time.Now().Format("2006-01-02 15:04:05"),
-		SourceAddr: conn.Conn.RemoteAddr().String(),
-		SourceNO:   conn.User.NO,
-		User:       conn.User,
-	}
-
-	p.MsgChan <- msg
-}
-
 //将消息广播给客户端
 func (p *ChatRoom) Broadcast(msg *models.Msg) {
+
+	//将聊天记录存储到mongo
+
 	for _, client := range p.Clients {
 		//发送给除自己之外的客户端
 		if client.Conn.RemoteAddr().String() != msg.SourceAddr {

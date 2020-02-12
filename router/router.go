@@ -9,7 +9,6 @@ import (
 	"github.com/kataras/iris/middleware/logger"
 	recover2 "github.com/kataras/iris/middleware/recover"
 	"github.com/kataras/iris/mvc"
-	"github.com/kataras/iris/websocket"
 )
 
 func ChatRouter() *iris.Application {
@@ -30,16 +29,11 @@ func ChatRouter() *iris.Application {
 	mvc.Configure(app.Party("/friends"), func(a *mvc.Application) {
 		a.Handle(new(controller.FriendsController))
 	})
-	mvc.Configure(app.Party("/ws"), ConfigureMvc)
+	mvc.Configure(app.Party("/ws"), func(a *mvc.Application) {
+		a.Handle(new(controller2.ChatController))
+	})
 
 	return app
-}
-
-func ConfigureMvc(a *mvc.Application) {
-	ws := websocket.New(websocket.Config{})
-	a.Router.Any("/iris-ws.js",websocket.ClientHandler())
-	a.Register(ws.Upgrade)
-	a.Handle(new(controller2.ChatController))
 }
 
 func forbidden(cxt iris.Context) {

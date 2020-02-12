@@ -41,6 +41,13 @@ type Msg struct {
 	SourceAddr string      `json:"source_addr"`
 	SourceNO   int64       `json:"source_no"`
 	User       models.User `json:"user"`
+	Holder     OutHolder  `json:"holder"` //退出聊天室
+}
+
+//退出聊天室
+type OutHolder struct {
+	Out bool
+	RoomName string
 }
 
 //创建房间
