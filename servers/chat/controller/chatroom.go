@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/HelloHaiGG/WeChat/listener"
 	"github.com/HelloHaiGG/WeChat/servers/chat/models"
 	"github.com/gorilla/websocket"
 	"time"
@@ -66,6 +67,10 @@ func (p *ChatRoom) Start() {
 		case msg, ok := <-p.MsgChan:
 			if ok {
 				p.Broadcast(msg)
+				//将非系统消息推送的聊天记录同步通道
+				if msg.KindMsg != 1{
+					listener.RecordChan <- msg
+				}
 			} else {
 				return
 			}

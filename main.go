@@ -7,6 +7,7 @@ import (
 	"github.com/HelloHaiGG/WeChat/common/imongo"
 	"github.com/HelloHaiGG/WeChat/common/iredis"
 	"github.com/HelloHaiGG/WeChat/config"
+	"github.com/HelloHaiGG/WeChat/listener"
 	"github.com/HelloHaiGG/WeChat/router"
 	"github.com/kataras/iris"
 )
@@ -32,6 +33,9 @@ func main() {
 	})
 
 	igorm.Init("chat")
+
+	//聊天记录备份开启
+	go listener.RecordChanListener()
 	////启动路由
 	//if err := testrouter.Router().Run(iris.Addr(":2428")); err != nil {
 	//	log.Fatalf("Router Run Err:%v", err)

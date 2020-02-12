@@ -49,6 +49,7 @@ func (p *RoomManager) ClientInRoom(roomName string, client *Client) mvc.Result {
 		return mvc.Response{Code: iris.StatusInternalServerError,}
 	} else {
 		r := room.(*ChatRoom)
+
 		r.Clients = append(r.Clients, client)
 		r.ClientsMap[client] = true
 		r.OnlineNum++
@@ -80,5 +81,20 @@ func (p *RoomManager) ClientOutRoom(roomName string, addr string) {
 			close(r.MsgChan)
 			p.RoomMap.Delete(roomName)
 		}
+	}
+}
+
+//判断用户是否已经存在于房间
+func (p *RoomManager) UserIsExit(room *ChatRoom, no int64) bool {
+
+	if room.OnlineNum <= 0 {
+		return false
+	} else {
+		for _, client := range room.Clients {
+			if client.User.NO == no {
+				return true
+			}
+		}
+		return false
 	}
 }

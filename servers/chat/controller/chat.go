@@ -78,9 +78,13 @@ func (p *ChatController) InitChatServer() mvc.Result {
 	go client.ReadMsg()
 
 	//判断改聊天室是否已经存在
-	if _, ok := roomManager.RoomMap.Load(roomName); !ok {
+	if room, ok := roomManager.RoomMap.Load(roomName); !ok {
 		p.Manager.InitRoom(roomName, client)
 	} else {
+		//判断用户是否已经进入到房间
+		if roomManager.UserIsExit(room.(*ChatRoom),client.User.NO){
+			return mvc.Response{Code:iris.StatusForbidden,Text:common.UserIsExitsInRoom}
+		}
 		roomManager.ClientInRoom(roomName, client)
 	}
 
