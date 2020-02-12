@@ -5,10 +5,10 @@ mysql:
   password: root123456
 
 redis:
-  host: 111.229.58.109
+  host: 127.0.0.1
   port: 6379
   user: root
-  password: root123456
+  password: root123
   db: 0
 
 mongo:
