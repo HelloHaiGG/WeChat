@@ -66,6 +66,7 @@ func (p *FriendsController) AddFriend() mvc.Result {
 			Code: iris.StatusInternalServerError,
 		}
 	}
+
 	return mvc.Response{
 		Code: iris.StatusOK,
 	}

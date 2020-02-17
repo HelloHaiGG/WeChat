@@ -14,7 +14,7 @@ func (p *TestController) Get() mvc.Result {
 	}
 }
 //根据请求方法和URL自动匹配处理方法 例如：GET http://localhost:8080/hello  匹配GetHello
-func (p *TestController) GetHello() string {
+func (p *TestController) GetHelloBy() string {
 	return "hello"
 }
 
